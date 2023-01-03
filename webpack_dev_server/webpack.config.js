@@ -23,7 +23,8 @@ module.exports = {
       devServer.app.use(apiMocker('/api', 'mocks/api'))
 
       return middelware;
-    }
+    },
+    hot: true
   },
   module: {
     rules: [
