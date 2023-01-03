@@ -2,3 +2,4 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 echo 커밋 전에 확인 중
+npx lint-staged
