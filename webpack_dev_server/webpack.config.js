@@ -5,9 +5,14 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const apiMocker = require("connect-api-mocker");
+const cssMinimizerWebpackPlugin = require("css-minimizer-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
+
+const mode = process.env.NODE_ENV || "development";
 
 module.exports = {
-  mode: "production",
+  mode: mode,
   entry: {
     main: "./src/app.js",
   },
@@ -20,11 +25,32 @@ module.exports = {
       overlay: true,
     },
     setupMiddlewares: (middelware, devServer) => {
-      devServer.app.use(apiMocker('/api', 'mocks/api'))
+      devServer.app.use(apiMocker("/api", "mocks/api"));
 
       return middelware;
     },
-    hot: true
+    hot: true,
+  },
+  optimization: {
+    minimizer:
+      mode === "production"
+        ? [
+            new cssMinimizerWebpackPlugin(),
+            new TerserPlugin({
+              terserOptions: {
+                compress: {
+                  drop_console: true,
+                },
+              },
+            }),
+          ]
+        : [],
+    splitChunks: {
+      chunks: "all",
+    },
+  },
+  externals: {
+    axios: "axios",
   },
   module: {
     rules: [
@@ -66,7 +92,7 @@ module.exports = {
         env: process.env.NODE_ENV === "development" ? "(개발용)" : "(배포용)",
       },
       minify: {
-        collapseWhitespace: false,
+        collapseWhitespace: true,
         removeComments: true,
       },
     }),
@@ -74,6 +100,13 @@ module.exports = {
     ...(process.env.NODE_ENV === "production"
       ? [new MiniCssExtractPlugin({ filename: "[name].css" })]
       : []),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: "./node_modules/axios/dist/axios.min.js",
+          to: "./axios.min.js",
+        },
+      ],
+    }),
   ],
-
 };
