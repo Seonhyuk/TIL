@@ -1,4 +1,4 @@
-## JS 개발환경 구축 공부용 repo
+## JS 개발환경 구축 + ES6+ 공부용 repo
 
 `.vscode` : 저장시 자동으로 lint 적용되도록 설정되어있다.
 `.husky` : git hooks 등 husky 관련 shell script 폴더
